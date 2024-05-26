@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Barcode-Scanner Sample</title>
+    <style>
+        button {
+            font-size: 3rem;
+        }
+
+        span {
+            position: relative;
+            display: inline-block;
+        }
+
+        video {
+            position: absolute;
+            left: 0;
+            top: 0;
+            display: block;
+            /* width: 640px; */
+        }
+
+        div.laser {
+            position: absolute;
+            background: red;
+            opacity: 0.5;
+        }
+
+        div.laser.horizontal {
+            left: 0;
+            width: 100%;
+        }
+
+        div.laser.vertical {
+            top: 0;
+            height: 100%;
+        }
+
+        div.laser.found {
+            background: lime;
+        }
+
+        div.canvas {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        canvas.horizontal {
+            width: 1280px;
+            height: 10px;
+        }
+
+        canvas.vertical {
+            width: 10px;
+            height: 1280px;
+        }
+
+        label.code {
+            font-size: 3.6em;
+            font-family: monospace;
+            white-space: pre-line;
+        }
+
+        input[type=number] {
+            width: 3rem;
+        }
+    </style>
+    <script src="sample.min.js"></script>
+</head>
+
+<body>
+    <section>
+        <a href="#" hidden id="on-button">ON</a>
+        <button hidden id="off-button">OFF</button>
+        <select hidden name="direction">
+            <option hidden value="horizontal" selected>horizontal</option>
+            <option hidden value="vertical">vertical</option>
+        </select><br>
+        <label hidden><input type="checkbox" name="barcode-type" value="code128" checked>CODE128</label>
+        <label hidden>(*) MIN SIZE:<input type="number" name="min-size" min="1" max="32" value="6"></label>
+    </section>
+    <section>
+        <span style="width: 100%;">
+            <video autoplay muted playsinline></video>
+            <div class="laser"></div>
+            <div class="canvas" style="width: 100%;"><canvas style="width: 100%;"></canvas></div>
+        </span>
+    </section>
+    <section>
+        <label id="result" class="code"></label>
+    </section>
+</body>
+<script>
+    setTimeout(()=> {
+        document.getElementById('on-button').click();
+        
+    }, 1000)
+    
+</script>
+
+</html>

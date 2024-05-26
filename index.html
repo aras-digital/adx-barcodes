@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Barcode Scanners Home</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+    h1 {
+      font-size: 2em;
+      margin-bottom: 20px;
+    }
+    .button-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 20px;
+    }
+    .button-container a {
+      text-decoration: none;
+    }
+    button {
+      /* padding: 10px 20px; */
+      font-size: 1em;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Welcome to Barcode Scanners</h1>
+  <div class="button-container">
+    <a href="zbar-wasm/index.html"><button>Zbar WASM</button></a>
+    <a href="quagga-js/index.html"><button>Quagga JS</button></a>
+    <a href="zxing-js/index.html"><button>Zxing JS</button></a>
+  </div>
+</body>
+</html>

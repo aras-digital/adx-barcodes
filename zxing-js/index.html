@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Responsive Barcode Scanner</title>
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+        }
+
+        .wrapper {
+            width: 100%;
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: white;
+        }
+
+        #video {
+            width: 100%;
+            height: auto;
+            border: 1px solid gray;
+        }
+
+        pre {
+            background-color: #f8f8f8;
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="wrapper">
+        <section id="demo-content">
+            <div>
+                <video id="video" autoplay></video>
+            </div>
+            <label>Result:</label>
+            <pre><code id="result"></code></pre>
+        </section>
+    </main>
+
+    <script src="https://unpkg.com/@zxing/library@latest/umd/index.min.js"></script>
+    <script>
+        window.addEventListener('load', function () {
+            const codeReader = new ZXing.BrowserMultiFormatReader();
+            codeReader.listVideoInputDevices().then((videoInputDevices) => {
+                if (videoInputDevices.length > 0) {
+                    const selectedDeviceId = videoInputDevices[0].deviceId;
+                    const videoConstraints = {
+                        deviceId: selectedDeviceId,
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 },
+                        facingMode: 'environment'
+                    };
+
+                    navigator.mediaDevices.getUserMedia({ video: videoConstraints })
+                        .then(stream => {
+                            const videoElement = document.getElementById('video');
+                            videoElement.srcObject = stream;
+                            codeReader.decodeFromVideoDevice(selectedDeviceId, 'video', (result, err) => {
+                                if (result) {
+                                    document.getElementById('result').textContent = result.text;
+                                    window.history.go(-1);
+                                    alert(result.text);
+                                }
+                                if (err && !(err instanceof ZXing.NotFoundException)) {
+                                    console.error(err);
+                                    document.getElementById('result').textContent = err;
+                                }
+                            });
+                        })
+                        .catch(err => console.error(err));
+                } else {
+                    console.error('No video input devices found');
+                }
+            }).catch(err => console.error(err));
+        });
+    </script>
+</body>
+
+</html>
