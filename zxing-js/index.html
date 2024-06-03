@@ -46,6 +46,10 @@
             <div>
                 <video id="video" autoplay></video>
             </div>
+            <div>
+                <label for="videoSelect">Choose Camera:</label>
+                <select id="videoSelect"></select>
+            </div>
             <label>Result:</label>
             <pre><code id="result"></code></pre>
         </section>
@@ -55,35 +59,54 @@
     <script>
         window.addEventListener('load', function () {
             const codeReader = new ZXing.BrowserMultiFormatReader();
+            const videoSelect = document.getElementById('videoSelect');
+
             codeReader.listVideoInputDevices().then((videoInputDevices) => {
                 if (videoInputDevices.length > 0) {
-                    const selectedDeviceId = videoInputDevices[0].deviceId;
-                    const videoConstraints = {
-                        deviceId: selectedDeviceId,
-                        facingMode: 'environment'
-                    };
+                    videoInputDevices.forEach((device, index) => {
+                        const option = document.createElement('option');
+                        option.value = device.deviceId;
+                        option.text = device.label || `Camera ${index + 1}`;
+                        videoSelect.appendChild(option);
+                    });
 
-                    navigator.mediaDevices.getUserMedia({ video: videoConstraints })
-                        .then(stream => {
-                            const videoElement = document.getElementById('video');
-                            videoElement.srcObject = stream;
-                            codeReader.decodeFromVideoDevice(selectedDeviceId, 'video', (result, err) => {
-                                if (result) {
-                                    document.getElementById('result').textContent = result.text;
-                                    window.history.go(-1);
-                                    alert(result.text);
-                                }
-                                if (err && !(err instanceof ZXing.NotFoundException)) {
-                                    console.error(err);
-                                    document.getElementById('result').textContent = err;
-                                }
-                            });
-                        })
-                        .catch(err => console.error(err));
+                    const backCamera = videoInputDevices.find(device => device.label.toLowerCase().includes('back')) || videoInputDevices[0];
+                    videoSelect.value = backCamera.deviceId;
+
+                    videoSelect.addEventListener('change', () => {
+                        startScanner(videoSelect.value);
+                    });
+
+                    startScanner(videoSelect.value);
                 } else {
                     console.error('No video input devices found');
                 }
             }).catch(err => console.error(err));
+
+            function startScanner(deviceId) {
+                const videoConstraints = {
+                    deviceId: { exact: deviceId },
+                    facingMode: 'environment'
+                };
+
+                navigator.mediaDevices.getUserMedia({ video: videoConstraints })
+                    .then(stream => {
+                        const videoElement = document.getElementById('video');
+                        videoElement.srcObject = stream;
+                        codeReader.decodeFromVideoDevice(deviceId, 'video', (result, err) => {
+                            if (result) {
+                                document.getElementById('result').textContent = result.text;
+                                window.history.go(-1);
+                                alert(result.text);
+                            }
+                            if (err && !(err instanceof ZXing.NotFoundException)) {
+                                console.error(err);
+                                document.getElementById('result').textContent = err;
+                            }
+                        });
+                    })
+                    .catch(err => console.error(err));
+            }
         });
     </script>
 </body>
