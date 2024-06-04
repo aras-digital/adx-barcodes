@@ -11,7 +11,6 @@ let
     afterPreviousCallFinished,
     requestId = null;
 
-el.usingOffscreenCanvas.innerText = usingOffscreenCanvas ? 'yes' : 'no'
 
 
 function isOffscreenCanvasWorking() {
@@ -32,40 +31,70 @@ function formatNumber(number, fractionDigits = 1) {
 
 
 function detect(source) {
-    const afterFunctionCalled = performance.now(),
-          canvas = el.canvas,
-          ctx = canvas.getContext('2d');
+    const
+        afterFunctionCalled = performance.now(),
+        canvas = el.canvas,
+        ctx = canvas.getContext('2d');
 
-    canvas.width = source.naturalWidth || source.videoWidth || source.width;
-    canvas.height = source.naturalHeight || source.videoHeight || source.height;
+    function getOffCtx2d(width, height) {
+        if (usingOffscreenCanvas) {
+            if (!offCanvas || (offCanvas.width !== width) || (offCanvas.height !== height)) {
+                // Only resizing the canvas caused Chromium to become progressively slower
+                offCanvas = new OffscreenCanvas(width, height)
+            }
+
+            return offCanvas.getContext('2d')
+        }
+    }
+
+    canvas.width = source.naturalWidth || source.videoWidth || source.width
+    canvas.height = source.naturalHeight || source.videoHeight || source.height
 
     if (canvas.height && canvas.width) {
-        const offCtx = getOffCtx2d(canvas.width, canvas.height) || ctx;
+        const offCtx = getOffCtx2d(canvas.width, canvas.height) || ctx
 
-        offCtx.drawImage(source, 0, 0);
+        offCtx.drawImage(source, 0, 0)
 
-        const afterDrawImage = performance.now(),
-              imageData = offCtx.getImageData(0, 0, canvas.width, canvas.height),
-              afterGetImageData = performance.now();
+        const
+            afterDrawImage = performance.now(),
+            imageData = offCtx.getImageData(0, 0, canvas.width, canvas.height),
+            afterGetImageData = performance.now();
 
-        zbarWasm.scanImageData(imageData)
+        return zbarWasm
+            .scanImageData(imageData)
             .then(symbols => {
-                const afterScanImageData = performance.now();
+                const afterScanImageData = performance.now()
 
-                if (symbols.length > 0) {
-                    const barcodeData = symbols.map(symbol => `${symbol.typeName}: ${symbol.decode()}`).join(', ');
-                    sendBarcodeData(barcodeData); // Taranan barkod verisini Angular uygulamasına gönder
+                symbols.forEach(symbol => {
+                    const lastPoint = symbol.points[symbol.points.length - 1]
+                    ctx.moveTo(lastPoint.x, lastPoint.y)
+                    symbol.points.forEach(point => ctx.lineTo(point.x, point.y))
+
+                    ctx.lineWidth = Math.max(Math.min(canvas.height, canvas.width) / 100, 1)
+                    ctx.strokeStyle = '#00e00060'
+                    ctx.stroke()
+                })
+
+                // el.result.innerText = JSON.stringify(symbols, null, 2)
+                if (symbols[0]?.typeName) {
+                    const decodedValue = symbols[0]?.decode();
+                    //alert(decodedValue)
+                   
+                    stopStream()
+                    setTimeout(()=>{
+                        parent.postMessage({ type: 'decodedValue', value: decodedValue }, '*');
+                        window.history.go(-1);
+                    }, 500);
                 }
 
-                updateUI(symbols, afterFunctionCalled, afterDrawImage, afterGetImageData, afterScanImageData, ctx); // UI güncelleme işlemleri
-            }).catch(error => {
-                console.error('Error scanning image data:', error);
-                el.result.innerText = 'Error scanning barcode';
-            });
+
+                    
+                afterPreviousCallFinished = performance.now()
+            })
+
     } else {
-        el.result.innerText = 'Source not ready';
-        el.timing.className = '';
-        return Promise.resolve();
+
+        return Promise.resolve()
     }
 }
 
@@ -83,45 +112,36 @@ function detectVideo(active) {
 }
 
 function startStream() {
-    const videoElement = document.getElementById('video');
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-        .then(function(stream) {
-            videoElement.srcObject = stream;
-            videoElement.play();
-            initBarcodeScanner(videoElement);
+    if (!requestId) {
+        navigator.mediaDevices.getUserMedia({
+            audio: false, video: {
+                facingMode: 'environment', focusMode: "continuous", width: { ideal: 1280 },
+                height: { ideal: 720 },
+            }
         })
-        .catch(function(error) {
-            console.error("Kamera erişimi sağlanamadı:", error);
-        });
+            .then(stream => {
+                el.video.srcObject = stream
+                detectVideo(true)
+            })
+            .catch(error => {
+                el.result.innerText = JSON.stringify(error)
+                el.timing.className = ''
+            })
+
     } else {
-        console.error("Bu tarayıcı medya cihazlarına erişimi desteklemiyor.");
+        detectVideo(false)
     }
 }
 
-function initBarcodeScanner(video) {
-    const zbar = new ZBarScanner({
-        video: video,
-        onDetected: function(result) {
-            console.log("Taranan barkod:", result);
-            alert('Barkod bulundu: ' + result);
-            // Tarayıcıyı durdur ve gerekiyorsa başka işlemler yap
-        }
-    });
-    zbar.start();
-}
+document.addEventListener("DOMContentLoaded", function (event) {
 
-document.addEventListener("DOMContentLoaded", function () {
-    startStream();
+    startStream()
 });
 function stopStream() {
     cancelAnimationFrame(requestId)
     requestId = null;
 
 }
-function sendBarcodeData(barcodeData) {
-    window.parent.postMessage({
-      type: 'barcode',
-      data: barcodeData
-    }, '*'); 
-  }
+// window.addEventListener('resize', () => {
+
+// });
