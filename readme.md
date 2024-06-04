@@ -29,3 +29,5 @@ Adx barcode scanning web application
 ---
 # 🚀 Demo
 [https://aras-digital.github.io/adx-barcodes/](https://aras-digital.github.io/adx-barcodes/)
+# 🧪 Test
+[https://aras-digital.github.io/adx-barcodes/test.html](https://aras-digital.github.io/adx-barcodes/test.html)
