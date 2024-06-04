@@ -19,7 +19,7 @@ Adx barcode scanning web application
         <iframe src="https://aras-digital.github.io/adx-barcodes/zbar-wasm/index.html" style="width: 600px; height: 400px;"></iframe>
         <script>
             window.addEventListener('message', (event) => {
-                alert(`İframe'den gelen mesaj: ${event.data.value}`);
+                    alert(`Message from iframe: ${event.data.value}`);
             }, false);
         </script>
     </body>
