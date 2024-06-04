@@ -16,7 +16,7 @@ Adx barcode scanning web application
     </head>
     <body>
         <h1>Ana Sayfa</h1>
-        <iframe src="zbar-wasm/index.html" style="width: 600px; height: 400px;"></iframe>
+        <iframe src="https://aras-digital.github.io/adx-barcodes/zbar-wasm/index.html" style="width: 600px; height: 400px;"></iframe>
         <script>
             window.addEventListener('message', (event) => {
                 alert(`İframe'den gelen mesaj: ${event.data.value}`);
