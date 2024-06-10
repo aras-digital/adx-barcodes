@@ -83,7 +83,6 @@ function detect(source) {
                     stopStream()
                     setTimeout(()=>{
                         parent.postMessage({ type: 'decodedValue', value: decodedValue }, '*');
-                        window.history.go(-1);
                     }, 500);
                 }
 
