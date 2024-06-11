@@ -78,12 +78,8 @@ function detect(source) {
                 // el.result.innerText = JSON.stringify(symbols, null, 2)
                 if (symbols[0]?.typeName) {
                     const decodedValue = symbols[0]?.decode();
-                    //alert(decodedValue)
-                   
                     stopStream()
-                    setTimeout(()=>{
-                        parent.postMessage({ type: 'decodedValue', value: decodedValue }, '*');
-                    }, 500);
+                    window.parent.postMessage({ type: symbols[0]?.typeName, value: decodedValue }, '*');
                 }
 
 
