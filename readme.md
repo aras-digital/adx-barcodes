@@ -31,3 +31,12 @@ Adx barcode scanning web application
 [https://aras-digital.github.io/adx-barcodes/](https://aras-digital.github.io/adx-barcodes/)
 # 🧪 Test
 [https://aras-digital.github.io/adx-barcodes/test.html](https://aras-digital.github.io/adx-barcodes/test.html)
+
+
+## License Notice
+
+This application incorporates open source software components: ZXing-js, Quagga-js, and ZBar.
+
+- **ZXing-js** is licensed under the Apache License 2.0. You can access the ZXing-js source code at [ZXing-js source code](https://github.com/zxing-js/library).
+- **Quagga-js** is distributed under the MIT License. The source code for Quagga-js is available at [Quagga-js source code](https://github.com/serratus/quaggaJS).
+- **ZBar** is licensed under the GNU Lesser General Public License (LGPL) Version 2.1. You can find the source code of ZBar at [ZBar source code](https://github.com/mchehab/zbar).
